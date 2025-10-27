@@ -32,7 +32,6 @@ const fontAssistantSystemPrompt = fs.readFileSync(
 
 
 
-var fonts = ["Roboto", "Open Sans", "Bitcount Grid Single","lfsdlsfdfl" , "Badeen Display"];
 
 
 
@@ -40,7 +39,7 @@ var fonts = ["Roboto", "Open Sans", "Bitcount Grid Single","lfsdlsfdfl" , "Badee
 
 
 
-async function sendMessageClaude  (message ) {
+async function sendMessageClaude  (userPrompt , userMessage ) {
 
     try {
 
@@ -49,7 +48,7 @@ async function sendMessageClaude  (message ) {
       {
         model: "claude-sonnet-4-5-20250929",
         messages: [
-          { role: "user", content: message }
+          { role: "user", content: `Prompt : ${userPrompt} et Message : ${userMessage}` }
         ],
         system: fontAssistantSystemPrompt,
         max_tokens: 500
@@ -91,14 +90,16 @@ async function sendMessageClaude  (message ) {
 
 app.post('/api/fonts', async (req , res ) => { 
    const userPrompt = req.body.prompt;
+   const userMessage = req.body.message
 
-      if (!userPrompt) {
-    return res.status(400).json({ error: 'Le champ prompt est requis.' });
+
+      if (!userPrompt || !userMessage) {
+    return res.status(400).json({ error: 'Les champs prompt et message sont requis.' });
   }
 
 
 
-  const responseClaude =  await sendMessageClaude (userPrompt);
+  const responseClaude =  await sendMessageClaude (userPrompt , userMessage);
 
 
 
