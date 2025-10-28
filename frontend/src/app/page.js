@@ -24,8 +24,8 @@ export default function Home() {
     setFontPreviews([]);
 
     try {
-      // TODO: Replace with actual backend API endpoint
-      const response = await fetch('/api/font-suggestions', {
+      // Call backend API endpoint
+      const response = await fetch('/api/fonts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ export default function Home() {
       }
 
       const data = await response.json();
-      setAiOutput(data.aiResponse);
+      setAiOutput(data.response);
       setFontPreviews(data.fonts || []);
     } catch (err) {
       setError('Sorry, something went wrong. Please try again.');
@@ -145,18 +145,18 @@ export default function Home() {
             <div className="mb-6">
               <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide">Test Preview</h4>
               <FontPreviewCard
-                fontFamily="Papyrus"
-                designer="Chris Costello"
+                fontFamily="Creepster"
                 previewText={userText || "The quick brown fox jumps over the lazy dog"}
                 cardStyle="elevated"
                 className="mb-4"
+                isGoogleFont={true}
               />
               <FontPreviewCard
-                fontFamily="Comic Sans MS"
-                designer="Vincent Connare"
+                fontFamily="Orbitron"
                 previewText={userText || "The quick brown fox jumps over the lazy dog"}
                 cardStyle="elevated"
                 className="mb-4"
+                isGoogleFont={true}
               />
             </div>
 
@@ -172,7 +172,6 @@ export default function Home() {
                 <FontPreviewCard
                   key={index}
                   fontFamily={font.family}
-                  designer={font.designer}
                   previewText={userText}
                   cardStyle="default"
                 />
