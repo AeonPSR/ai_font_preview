@@ -14,8 +14,8 @@ export default function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!prompt.trim() || !userText.trim()) {
-      setError('Please fill in both the prompt and text fields.');
+    if (!prompt.trim()) {
+      setError('Please fill in the font style request field.');
       return;
     }
 
@@ -25,14 +25,14 @@ export default function Home() {
 
     try {
       // Call backend API endpoint
-      const response = await fetch('/api/fonts', {
+      const response = await fetch('http://localhost:3000/api/fonts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           prompt: prompt.trim(),
-          text: userText.trim(),
+          message: userText.trim() || "The quick brown fox jumps over the lazy dog",
         }),
       });
 
@@ -93,7 +93,7 @@ export default function Home() {
               <div className="mt-4">
                 <button
                   onClick={handleSubmit}
-                  disabled={isLoading || !prompt.trim() || !userText.trim()}
+                  disabled={isLoading || !prompt.trim()}
                   className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
                 >
                   {isLoading ? 'Finding Fonts...' : 'Get Font Suggestions'}
@@ -141,28 +141,9 @@ export default function Home() {
           <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 lg:overflow-y-auto">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Font Previews</h3>
             
-            {/* Hardcoded Test Cards */}
-            <div className="mb-6">
-              <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide">Test Preview</h4>
-              <FontPreviewCard
-                fontFamily="Creepster"
-                previewText={userText || "The quick brown fox jumps over the lazy dog"}
-                cardStyle="elevated"
-                className="mb-4"
-                isGoogleFont={true}
-              />
-              <FontPreviewCard
-                fontFamily="Orbitron"
-                previewText={userText || "The quick brown fox jumps over the lazy dog"}
-                cardStyle="elevated"
-                className="mb-4"
-                isGoogleFont={true}
-              />
-            </div>
-
             {fontPreviews.length === 0 && !isLoading && (
-              <div className="text-center py-4">
-                <p className="text-gray-500 dark:text-gray-400 text-sm">Dynamic font previews will appear here</p>
+              <div className="text-center py-8">
+                <p className="text-gray-500 dark:text-gray-400">Font previews will appear here after you submit your request</p>
               </div>
             )}
             
@@ -172,7 +153,7 @@ export default function Home() {
                 <FontPreviewCard
                   key={index}
                   fontFamily={font.family}
-                  previewText={userText}
+                  previewText={userText || "The quick brown fox jumps over the lazy dog"}
                   cardStyle="default"
                 />
               ))}

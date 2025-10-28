@@ -5,11 +5,13 @@ import axios from "axios"
 import fs from "fs"
 import path from 'path'
 import { fileURLToPath } from 'url';
+import cors from "cors";
 
 
 dotenv.config();
 
 const app = express ();
+app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
  
 
