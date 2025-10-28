@@ -5,15 +5,19 @@ import axios from "axios"
 import fs from "fs"
 import path from 'path'
 import { fileURLToPath } from 'url';
-import cors from "cors";
+import cors from "cors"
 
 
 dotenv.config();
 
 const app = express ();
-app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
  
+app.use(cors({
+  origin: "http://localhost:3001", // autorise seulement ton frontend
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"]
+}));
 
 const GOOGLE_FONTS_API_KEY = process.env.GOOGLE_FONTS_API_KEY;
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY;
@@ -41,7 +45,7 @@ const fontAssistantSystemPrompt = fs.readFileSync(
 
 
 
-async function sendMessageClaude  (userPrompt , userMessage ) {
+async function sendMessageClaude  (prompt , message, filters ) {
 
     try {
 
@@ -50,7 +54,7 @@ async function sendMessageClaude  (userPrompt , userMessage ) {
       {
         model: "claude-sonnet-4-5-20250929",
         messages: [
-          { role: "user", content: `Prompt : ${userPrompt} et Message : ${userMessage}` }
+       { role: "user", content: `Prompt: ${prompt}, Message: ${message}, Filters: ${JSON.stringify(filters)}` }
         ],
         system: fontAssistantSystemPrompt,
         max_tokens: 500
@@ -91,17 +95,18 @@ async function sendMessageClaude  (userPrompt , userMessage ) {
 
 
 app.post('/api/fonts', async (req , res ) => { 
-   const userPrompt = req.body.prompt;
-   const userMessage = req.body.message
+   const prompt = req.body.prompt;
+   const message = req.body.message
+   const filters = req.body.filters;
 
 
-      if (!userPrompt || !userMessage) {
+      if (!prompt || !message) {
     return res.status(400).json({ error: 'Les champs prompt et message sont requis.' });
   }
 
 
 
-  const responseClaude =  await sendMessageClaude (userPrompt , userMessage);
+  const responseClaude =  await sendMessageClaude (prompt , message , filters );
 
 
 
