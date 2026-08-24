@@ -60,7 +60,7 @@ export default function Home() {
     setFontPreviews([]);
 
     try {
-      const response = await fetch('http://localhost:3000/api/fonts', {
+      const response = await fetch('https://ai-font-preview-backend.onrender.com/api/fonts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
