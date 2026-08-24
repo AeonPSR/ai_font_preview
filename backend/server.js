@@ -89,7 +89,7 @@ app.post('/api/fonts', async (req, res) => {
 
     const responseGemini = await sendMessageGemini(prompt, message, filters);
 
-    
+
     if (!responseGemini || !responseGemini.fonts) {
       return res.status(500).json({ error: "L'IA n'a pas pu générer de réponse valide." });
     }
