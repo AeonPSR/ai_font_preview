@@ -54,6 +54,24 @@ async function sendMessageGemini(prompt, message, filters) {
   }
 }
 
+
+// Variable pour stocker la liste des polices en mémoire
+let cachedGoogleFonts = [];
+
+async function loadGoogleFontsCache() {
+  try {
+    const response = await fetch(`https://www.googleapis.com/webfonts/v1/webfonts?key=${GOOGLE_FONTS_API_KEY}`);
+    const data = await response.json();
+    if (data.items) {
+      cachedGoogleFonts = data.items;
+      console.log(`✅ ${cachedGoogleFonts.length} polices Google chargées en cache.`);
+    }
+  } catch (error) {
+    console.error("Erreur chargement cache Google Fonts:", error.message);
+  }
+}
+
+
 app.post('/api/fonts', async (req, res) => {
   const prompt = req.body.prompt;
   const message = req.body.message
@@ -64,26 +82,27 @@ app.post('/api/fonts', async (req, res) => {
     return res.status(400).json({ error: 'Les champs prompt et message sont requis.' });
   }
 
-  const responseClaude = await sendMessageGemini(prompt, message, filters);
 
   try {
 
-    const response = await fetch(`https://www.googleapis.com/webfonts/v1/webfonts?key=${GOOGLE_FONTS_API_KEY}`);
-    const data = await response.json();
-    console.log("Statut HTTP :", response.status);
-    console.log("Status text :", response.statusText);
-    const selectedFonts = data.items
-      .filter(item => responseClaude.fonts.map(f => f.toLowerCase()).includes(item.family.toLowerCase()))
+    const responseGemini = await sendMessageGemini(prompt, message, filters);
+
+    if (cachedGoogleFonts.length === 0) {
+      await loadGoogleFontsCache();
+    }
+
+    const requestedFonts = responseClaude.fonts.map(f => f.toLowerCase());
+
+    const selectedFonts = cachedGoogleFonts
+      .filter(item => requestedFonts.includes(item.family.toLowerCase()))
       .map(item => ({
         family: item.family,
         category: item.category,
-        // lien <link> à mettre dans <head>
         link: `https://fonts.googleapis.com/css2?family=${encodeURIComponent(item.family)}&display=swap`,
-        // lien pour voir/télécharger la police sur Google Fonts
         googleLink: `https://fonts.google.com/specimen/${encodeURIComponent(item.family)}`
       }));
 
-    res.json({ response: responseClaude.response, fonts: selectedFonts });
+    res.json({ response: geminiResponse.response, fonts: selectedFonts });
 
   }
   catch (error) {
