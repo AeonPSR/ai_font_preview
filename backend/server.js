@@ -57,7 +57,6 @@ async function sendMessageGemini(prompt, message, filters) {
   }
 }
 
-
 // Variable pour stocker la liste des polices en mémoire
 let cachedGoogleFonts = [];
 
@@ -89,6 +88,11 @@ app.post('/api/fonts', async (req, res) => {
   try {
 
     const responseGemini = await sendMessageGemini(prompt, message, filters);
+
+    
+    if (!responseGemini || !responseGemini.fonts) {
+      return res.status(500).json({ error: "L'IA n'a pas pu générer de réponse valide." });
+    }
 
     if (cachedGoogleFonts.length === 0) {
       await loadGoogleFontsCache();
