@@ -103,6 +103,8 @@ export default function Home() {
               className="w-full h-24 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
               disabled={isLoading}
             />
+            Error : 
+            <div className='text-red-500'> {error && error}</div>
           </div>
 
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
