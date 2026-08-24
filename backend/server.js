@@ -1,7 +1,6 @@
 import express from "express";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
-import axios from "axios"
 import fs from "fs"
 import path from 'path'
 import { fileURLToPath } from 'url';
@@ -33,6 +32,10 @@ const fontAssistantSystemPrompt = fs.readFileSync(
   'utf-8'
 );
 
+
+app.get('/api/ping', (req, res) => {
+  res.status(200).json({ status: "ok", message: "Server is awake!" });
+});
 
 async function sendMessageGemini(prompt, message, filters) {
   try {
@@ -91,7 +94,7 @@ app.post('/api/fonts', async (req, res) => {
       await loadGoogleFontsCache();
     }
 
-    const requestedFonts = responseClaude.fonts.map(f => f.toLowerCase());
+    const requestedFonts = responseGemini.fonts.map(f => f.toLowerCase());
 
     const selectedFonts = cachedGoogleFonts
       .filter(item => requestedFonts.includes(item.family.toLowerCase()))
@@ -102,7 +105,7 @@ app.post('/api/fonts', async (req, res) => {
         googleLink: `https://fonts.google.com/specimen/${encodeURIComponent(item.family)}`
       }));
 
-    res.json({ response: geminiResponse.response, fonts: selectedFonts });
+    res.json({ response: responseGemini.response, fonts: selectedFonts });
 
   }
   catch (error) {
@@ -111,4 +114,7 @@ app.post('/api/fonts', async (req, res) => {
   }
 })
 
-app.listen(PORT, () => console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`));
+app.listen(PORT, async () => {
+  console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
+  await loadGoogleFontsCache();
+});
